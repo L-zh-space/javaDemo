@@ -38,330 +38,330 @@ import java.sql.*;
  */
 public class SQLPractice {
 
-    private static final String JDBC_URL = "jdbc:h2:mem:sqldb;DB_CLOSE_DELAY=-1";
-    private static final String USER = "sa";
-    private static final String PASSWORD = "";
+  private static final String JDBC_URL = "jdbc:mysql://localhost:3306/edu_platform_mysql_demo?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+  private static final String USER = "root";
+  private static final String PASSWORD = "315689";
 
-    public static void main(String[] args) {
-        initDatabase();
+  public static void main(String[] args) {
+    // initDatabase();
 
-        System.out.println("\n========== 1. 基本查询(WHERE/ORDER BY/LIMIT) ==========");
-        basicQuery();
+    System.out.println("\n========== 1. 基本查询(WHERE/ORDER BY/LIMIT) ==========");
+    // basicQuery();
 
-        System.out.println("\n========== 2. JOIN联表查询 ==========");
-        joinQuery();
+    // System.out.println("\n========== 2. JOIN联表查询 ==========");
+    joinQuery();
 
-        System.out.println("\n========== 3. 聚合函数 + GROUP BY + HAVING ==========");
-        groupByQuery();
+    // System.out.println("\n========== 3. 聚合函数 + GROUP BY + HAVING ==========");
+    // groupByQuery();
 
-        System.out.println("\n========== 4. 子查询 ==========");
-        subQuery();
+    // System.out.println("\n========== 4. 子查询 ==========");
+    // subQuery();
 
-        System.out.println("\n========== 5. 索引 ==========");
-        indexDemo();
+    // System.out.println("\n========== 5. 索引 ==========");
+    // indexDemo();
 
-        System.out.println("\n========== 6. 事务隔离级别 ==========");
-        isolationDemo();
+    // System.out.println("\n========== 6. 事务隔离级别 ==========");
+    // isolationDemo();
 
-        System.out.println("\n========== 7. 常见SQL陷阱 ==========");
-        sqlTrapDemo();
+    // System.out.println("\n========== 7. 常见SQL陷阱 ==========");
+    // sqlTrapDemo();
+  }
+
+  static void initDatabase() {
+    try (Connection conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
+        Statement stmt = conn.createStatement()) {
+
+      // 班级表
+      stmt.execute("""
+          CREATE TABLE class (
+              id INT AUTO_INCREMENT PRIMARY KEY,
+              name VARCHAR(20) NOT NULL
+          )
+          """);
+
+      // 学生表
+      stmt.execute("""
+          CREATE TABLE student (
+              id INT AUTO_INCREMENT PRIMARY KEY,
+              name VARCHAR(50) NOT NULL,
+              age INT,
+              class_id INT
+          )
+          """);
+
+      // 成绩表
+      stmt.execute("""
+          CREATE TABLE score (
+              id INT AUTO_INCREMENT PRIMARY KEY,
+              student_id INT,
+              subject VARCHAR(20),
+              score DECIMAL(5,1)
+          )
+          """);
+
+      // 插入数据
+      stmt.execute("INSERT INTO class VALUES (1, '一班'), (2, '二班'), (3, '三班')");
+      stmt.execute("INSERT INTO student VALUES (1, '张三', 20, 1), (2, '李四', 22, 1), "
+          + "(3, '王五', 21, 2), (4, '赵六', 23, 2), (5, '孙七', 19, NULL)");
+      stmt.execute("INSERT INTO score VALUES "
+          + "(1, 1, '语文', 85), (2, 1, '数学', 92), (3, 1, '英语', 78), "
+          + "(4, 2, '语文', 90), (5, 2, '数学', 88), (6, 2, '英语', 95), "
+          + "(7, 3, '语文', 72), (8, 3, '数学', 65), "
+          + "(9, 4, '语文', 88), (10, 4, '数学', 91)");
+
+      System.out.println("数据库初始化完成: 3张表 + 测试数据");
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+  }
 
-    static void initDatabase() {
-        try (Connection conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
-             Statement stmt = conn.createStatement()) {
+  static void basicQuery() {
+    try (Connection conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
+        Statement stmt = conn.createStatement()) {
 
-            // 班级表
-            stmt.execute("""
-                CREATE TABLE class (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    name VARCHAR(20) NOT NULL
-                )
-                """);
+      System.out.println("【SELECT 执行顺序】FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY");
 
-            // 学生表
-            stmt.execute("""
-                CREATE TABLE student (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    name VARCHAR(50) NOT NULL,
-                    age INT,
-                    class_id INT
-                )
-                """);
+      // 查询id大于10的学生
+      // try (ResultSet rs = stmt.executeQuery(
+      // "SELECT name, id FROM students WHERE id > 10 ORDER BY id DESC")) {
+      // System.out.println("id>10的学生（降序）:");
+      // while (rs.next()) {
+      // System.out.println(" " + rs.getString("name") + " " + rs.getInt("id"));
+      // }
+      // }
 
-            // 成绩表
-            stmt.execute("""
-                CREATE TABLE score (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    student_id INT,
-                    subject VARCHAR(20),
-                    score DECIMAL(5,1)
-                )
-                """);
+      // LIMIT 分页（假设每页2条，第2页）
+      // System.out.println("\n分页查询（第3页，每页3条）:");
+      // try (ResultSet rs = stmt.executeQuery(
+      // "SELECT name, id FROM students ORDER BY id LIMIT 6,3")) {
+      // // MySQL用LIMIT 2,2，H2用LIMIT 2 OFFSET 2
+      // while (rs.next()) {
+      // System.out.println(" " + rs.getString("name") + rs.getString("id"));
+      // }
+      // }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
 
-            // 插入数据
-            stmt.execute("INSERT INTO class VALUES (1, '一班'), (2, '二班'), (3, '三班')");
-            stmt.execute("INSERT INTO student VALUES (1, '张三', 20, 1), (2, '李四', 22, 1), "
-                    + "(3, '王五', 21, 2), (4, '赵六', 23, 2), (5, '孙七', 19, NULL)");
-            stmt.execute("INSERT INTO score VALUES "
-                    + "(1, 1, '语文', 85), (2, 1, '数学', 92), (3, 1, '英语', 78), "
-                    + "(4, 2, '语文', 90), (5, 2, '数学', 88), (6, 2, '英语', 95), "
-                    + "(7, 3, '语文', 72), (8, 3, '数学', 65), "
-                    + "(9, 4, '语文', 88), (10, 4, '数学', 91)");
+  static void joinQuery() {
+    try (Connection conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
+        Statement stmt = conn.createStatement()) {
 
-            System.out.println("数据库初始化完成: 3张表 + 测试数据");
-        } catch (SQLException e) {
-            e.printStackTrace();
+      // INNER JOIN — 只返回匹配的行
+      System.out.println("INNER JOIN（学生+班级，只返回有班级的学生）:");
+      try (ResultSet rs = stmt.executeQuery("""
+          SELECT s.name AS 学生, c.name AS 班级
+          FROM student s
+          INNER JOIN class c ON s.class_id = c.id
+          """)) {
+        while (rs.next()) {
+          System.out.println("  " + rs.getString("学生") + " → " + rs.getString("班级"));
         }
-    }
+      }
 
-    static void basicQuery() {
-        try (Connection conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
-             Statement stmt = conn.createStatement()) {
-
-            System.out.println("【SELECT 执行顺序】FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY");
-
-            // 查询年龄大于20的学生
-            try (ResultSet rs = stmt.executeQuery(
-                    "SELECT name, age FROM student WHERE age > 20 ORDER BY age DESC")) {
-                System.out.println("年龄>20的学生（降序）:");
-                while (rs.next()) {
-                    System.out.println("  " + rs.getString("name") + " " + rs.getInt("age") + "岁");
-                }
-            }
-
-            // LIMIT 分页（假设每页2条，第2页）
-            System.out.println("\n分页查询（第2页，每页2条）:");
-            try (ResultSet rs = stmt.executeQuery(
-                    "SELECT name FROM student ORDER BY id LIMIT 2 OFFSET 2")) {
-                // MySQL用LIMIT 2,2，H2用LIMIT 2 OFFSET 2
-                while (rs.next()) {
-                    System.out.println("  " + rs.getString("name"));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+      // LEFT JOIN — 左表全部返回
+      System.out.println("\nLEFT JOIN（学生+班级，所有学生都出现）:");
+      try (ResultSet rs = stmt.executeQuery("""
+          SELECT s.name AS 学生, c.name AS 班级
+          FROM student s
+          LEFT JOIN class c ON s.class_id = c.id
+          """)) {
+        while (rs.next()) {
+          String cname = rs.getString("班级");
+          System.out.println("  " + rs.getString("学生") + " → "
+              + (cname != null ? cname : "【NULL-无班级】"));
         }
-    }
+      }
 
-    static void joinQuery() {
-        try (Connection conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
-             Statement stmt = conn.createStatement()) {
-
-            // INNER JOIN — 只返回匹配的行
-            System.out.println("INNER JOIN（学生+班级，只返回有班级的学生）:");
-            try (ResultSet rs = stmt.executeQuery("""
-                    SELECT s.name AS 学生, c.name AS 班级
-                    FROM student s
-                    INNER JOIN class c ON s.class_id = c.id
-                    """)) {
-                while (rs.next()) {
-                    System.out.println("  " + rs.getString("学生") + " → " + rs.getString("班级"));
-                }
-            }
-
-            // LEFT JOIN — 左表全部返回
-            System.out.println("\nLEFT JOIN（学生+班级，所有学生都出现）:");
-            try (ResultSet rs = stmt.executeQuery("""
-                    SELECT s.name AS 学生, c.name AS 班级
-                    FROM student s
-                    LEFT JOIN class c ON s.class_id = c.id
-                    """)) {
-                while (rs.next()) {
-                    String cname = rs.getString("班级");
-                    System.out.println("  " + rs.getString("学生") + " → "
-                            + (cname != null ? cname : "【NULL-无班级】"));
-                }
-            }
-
-            // 三表联查
-            System.out.println("\n三表联查（学生+班级+成绩）:");
-            try (ResultSet rs = stmt.executeQuery("""
-                    SELECT s.name AS 学生, c.name AS 班级, sc.subject AS 科目, sc.score AS 成绩
-                    FROM student s
-                    INNER JOIN class c ON s.class_id = c.id
-                    INNER JOIN score sc ON s.id = sc.student_id
-                    ORDER BY s.name, sc.subject
-                    """)) {
-                while (rs.next()) {
-                    System.out.printf("  %s | %s | %s | %.1f%n",
-                            rs.getString("学生"), rs.getString("班级"),
-                            rs.getString("科目"), rs.getDouble("成绩"));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+      // 三表联查
+      System.out.println("\n三表联查（学生+班级+成绩）:");
+      try (ResultSet rs = stmt.executeQuery("""
+          SELECT s.name AS 学生, c.name AS 班级, sc.subject AS 科目, sc.score AS 成绩
+          FROM student s
+          INNER JOIN class c ON s.class_id = c.id
+          INNER JOIN score sc ON s.id = sc.student_id
+          ORDER BY s.name, sc.subject
+          """)) {
+        while (rs.next()) {
+          System.out.printf("  %s | %s | %s | %.1f%n",
+              rs.getString("学生"), rs.getString("班级"),
+              rs.getString("科目"), rs.getDouble("成绩"));
         }
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+  }
 
-    static void groupByQuery() {
-        try (Connection conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
-             Statement stmt = conn.createStatement()) {
+  static void groupByQuery() {
+    try (Connection conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
+        Statement stmt = conn.createStatement()) {
 
-            // 每个学生的平均分
-            System.out.println("每个学生的平均分:");
-            try (ResultSet rs = stmt.executeQuery("""
-                    SELECT s.name, AVG(sc.score) AS 平均分, COUNT(*) AS 科目数
-                    FROM student s
-                    INNER JOIN score sc ON s.id = sc.student_id
-                    GROUP BY s.id, s.name
-                    HAVING AVG(sc.score) >= 80
-                    ORDER BY 平均分 DESC
-                    """)) {
-                System.out.println("（HAVING过滤平均分>=80的）");
-                while (rs.next()) {
-                    System.out.printf("  %s: 平均%.1f (%d门课)%n",
-                            rs.getString("name"), rs.getDouble("平均分"),
-                            rs.getInt("科目数"));
-                }
-            }
-
-            // 每个班级的学生人数
-            System.out.println("\n每个班级人数:");
-            try (ResultSet rs = stmt.executeQuery("""
-                    SELECT c.name, COUNT(s.id) AS 人数
-                    FROM class c
-                    LEFT JOIN student s ON c.id = s.class_id
-                    GROUP BY c.id, c.name
-                    """)) {
-                while (rs.next()) {
-                    System.out.println("  " + rs.getString("name") + ": "
-                            + rs.getInt("人数") + "人");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+      // 每个学生的平均分
+      System.out.println("每个学生的平均分:");
+      try (ResultSet rs = stmt.executeQuery("""
+          SELECT s.name, AVG(sc.score) AS 平均分, COUNT(*) AS 科目数
+          FROM student s
+          INNER JOIN score sc ON s.id = sc.student_id
+          GROUP BY s.id, s.name
+          HAVING AVG(sc.score) >= 80
+          ORDER BY 平均分 DESC
+          """)) {
+        System.out.println("（HAVING过滤平均分>=80的）");
+        while (rs.next()) {
+          System.out.printf("  %s: 平均%.1f (%d门课)%n",
+              rs.getString("name"), rs.getDouble("平均分"),
+              rs.getInt("科目数"));
         }
-    }
+      }
 
-    static void subQuery() {
-        try (Connection conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
-             Statement stmt = conn.createStatement()) {
-
-            // WHERE子查询 — 查询高于平均分的学生
-            System.out.println("高于平均分的学生（WHERE子查询）:");
-            try (ResultSet rs = stmt.executeQuery("""
-                    SELECT s.name, AVG(sc.score) AS 平均分
-                    FROM student s
-                    INNER JOIN score sc ON s.id = sc.student_id
-                    GROUP BY s.id, s.name
-                    HAVING AVG(sc.score) > (SELECT AVG(score) FROM score)
-                    """)) {
-                while (rs.next()) {
-                    System.out.printf("  %s: %.1f%n",
-                            rs.getString("name"), rs.getDouble("平均分"));
-                }
-            }
-
-            // FROM子查询
-            System.out.println("\n每个学生最高分科目（FROM子查询）:");
-            try (ResultSet rs = stmt.executeQuery("""
-                    SELECT s.name, sc.subject, sc.score
-                    FROM student s
-                    INNER JOIN score sc ON s.id = sc.student_id
-                    INNER JOIN (
-                        SELECT student_id, MAX(score) AS max_score
-                        FROM score GROUP BY student_id
-                    ) t ON sc.student_id = t.student_id AND sc.score = t.max_score
-                    """)) {
-                while (rs.next()) {
-                    System.out.printf("  %s: %s %.1f分%n",
-                            rs.getString("name"), rs.getString("subject"),
-                            rs.getDouble("score"));
-                }
-            }
-
-            // EXISTS 子查询 — 有成绩的学生
-            System.out.println("\n有考试成绩的学生（EXISTS）:");
-            try (ResultSet rs = stmt.executeQuery("""
-                    SELECT name FROM student s
-                    WHERE EXISTS (SELECT 1 FROM score sc WHERE sc.student_id = s.id)
-                    """)) {
-                while (rs.next()) {
-                    System.out.println("  " + rs.getString("name"));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+      // 每个班级的学生人数
+      System.out.println("\n每个班级人数:");
+      try (ResultSet rs = stmt.executeQuery("""
+          SELECT c.name, COUNT(s.id) AS 人数
+          FROM class c
+          LEFT JOIN student s ON c.id = s.class_id
+          GROUP BY c.id, c.name
+          """)) {
+        while (rs.next()) {
+          System.out.println("  " + rs.getString("name") + ": "
+              + rs.getInt("人数") + "人");
         }
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+  }
 
-    static void indexDemo() {
-        try (Connection conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
-             Statement stmt = conn.createStatement()) {
+  static void subQuery() {
+    try (Connection conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
+        Statement stmt = conn.createStatement()) {
 
-            // 创建索引
-            stmt.execute("CREATE INDEX idx_student_name ON student(name)");
-            stmt.execute("CREATE INDEX idx_score_student ON score(student_id)");
-            // 联合索引
-            stmt.execute("CREATE INDEX idx_score_stu_sub ON score(student_id, subject)");
-
-            System.out.println("创建索引: idx_student_name, idx_score_student, idx_score_stu_sub(联合索引)");
-            System.out.println("\n索引失效场景（面试高频！）：");
-            System.out.println("  1. WHERE中使用函数: WHERE UPPER(name) = '张三' → 索引失效");
-            System.out.println("  2. 前置模糊查询: WHERE name LIKE '%三' → 索引失效");
-            System.out.println("  3. 隐式类型转换: WHERE phone = 13800138000 (phone是varchar) → 索引失效");
-            System.out.println("  4. 联合索引不满足最左前缀: idx(a,b,c) 跳过a直接用b → 索引失效");
-            System.out.println("  5. OR连接非索引列: WHERE a=1 OR b=2 (b无索引) → 索引失效");
-            System.out.println("  6. NOT IN / != / <> → 可能不走索引");
-
-            System.out.println("\n索引使用 EXPLAIN 分析（查看执行计划）:");
-            try (ResultSet rs = stmt.executeQuery(
-                    "EXPLAIN SELECT * FROM student WHERE name = '张三'")) {
-                while (rs.next()) {
-                    System.out.println("  " + rs.getString(1));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+      // WHERE子查询 — 查询高于平均分的学生
+      System.out.println("高于平均分的学生（WHERE子查询）:");
+      try (ResultSet rs = stmt.executeQuery("""
+          SELECT s.name, AVG(sc.score) AS 平均分
+          FROM student s
+          INNER JOIN score sc ON s.id = sc.student_id
+          GROUP BY s.id, s.name
+          HAVING AVG(sc.score) > (SELECT AVG(score) FROM score)
+          """)) {
+        while (rs.next()) {
+          System.out.printf("  %s: %.1f%n",
+              rs.getString("name"), rs.getDouble("平均分"));
         }
-    }
+      }
 
-    static void isolationDemo() {
-        System.out.println("事务隔离级别（从低到高）：");
-        System.out.println("┌──────────────┬──────┬──────────┬──────┐");
-        System.out.println("│ 隔离级别      │ 脏读 │ 不可重复读│ 幻读 │");
-        System.out.println("├──────────────┼──────┼──────────┼──────┤");
-        System.out.println("│ READ UNCOMMITTED│ ✓  │    ✓     │  ✓  │");
-        System.out.println("│ READ COMMITTED  │ ✗  │    ✓     │  ✓  │");
-        System.out.println("│ REPEATABLE READ │ ✗  │    ✗     │  ✓  │");
-        System.out.println("│ SERIALIZABLE    │ ✗  │    ✗     │  ✗  │");
-        System.out.println("└──────────────┴──────┴──────────┴──────┘");
-        System.out.println("MySQL默认REPEATABLE READ，Oracle/PostgreSQL默认READ COMMITTED");
-
-        System.out.println("\n脏读: 读到未提交事务的数据（可能回滚）");
-        System.out.println("不可重复读: 同一事务两次读取结果不同（另一事务UPDATE）");
-        System.out.println("幻读: 同一事务两次查询结果行数不同（另一事务INSERT/DELETE）");
-    }
-
-    static void sqlTrapDemo() {
-        try (Connection conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
-             Statement stmt = conn.createStatement()) {
-
-            // 陷阱1：NOT IN + NULL
-            System.out.println("陷阱1: NOT IN 遇到 NULL");
-            try (ResultSet rs = stmt.executeQuery(
-                    "SELECT * FROM student WHERE class_id NOT IN (2, NULL)")) {
-                System.out.println("  结果: " + (rs.next() ? "有数据" : "空！"));
-                System.out.println("  原因: NOT IN中有NULL，整个条件变为NULL");
-            }
-
-            // 陷阱2：COUNT
-            System.out.println("\n陷阱2: COUNT(*) vs COUNT(列名)");
-            try (ResultSet rs = stmt.executeQuery(
-                    "SELECT COUNT(*) AS c1, COUNT(class_id) AS c2 FROM student")) {
-                rs.next();
-                System.out.println("  COUNT(*): " + rs.getInt("c1") + " (所有行)");
-                System.out.println("  COUNT(class_id): " + rs.getInt("c2") + " (class_id非NULL的行，孙七的class_id是NULL)");
-            }
-
-            // 陷阱3：WHERE vs HAVING
-            System.out.println("\n陷阱3: WHERE 不能跟聚合函数，HAVING 可以");
-            System.out.println("  正确: SELECT ... WHERE score > 80");       // 过滤行
-            System.out.println("  正确: SELECT ... HAVING AVG(score) > 80"); // 过滤分组
-            System.out.println("  错误: SELECT ... WHERE AVG(score) > 80");  // WHERE不能跟聚合函数
-        } catch (SQLException e) {
-            e.printStackTrace();
+      // FROM子查询
+      System.out.println("\n每个学生最高分科目（FROM子查询）:");
+      try (ResultSet rs = stmt.executeQuery("""
+          SELECT s.name, sc.subject, sc.score
+          FROM student s
+          INNER JOIN score sc ON s.id = sc.student_id
+          INNER JOIN (
+              SELECT student_id, MAX(score) AS max_score
+              FROM score GROUP BY student_id
+          ) t ON sc.student_id = t.student_id AND sc.score = t.max_score
+          """)) {
+        while (rs.next()) {
+          System.out.printf("  %s: %s %.1f分%n",
+              rs.getString("name"), rs.getString("subject"),
+              rs.getDouble("score"));
         }
+      }
+
+      // EXISTS 子查询 — 有成绩的学生
+      System.out.println("\n有考试成绩的学生（EXISTS）:");
+      try (ResultSet rs = stmt.executeQuery("""
+          SELECT name FROM student s
+          WHERE EXISTS (SELECT 1 FROM score sc WHERE sc.student_id = s.id)
+          """)) {
+        while (rs.next()) {
+          System.out.println("  " + rs.getString("name"));
+        }
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
+  }
+
+  static void indexDemo() {
+    try (Connection conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
+        Statement stmt = conn.createStatement()) {
+
+      // 创建索引
+      stmt.execute("CREATE INDEX idx_student_name ON student(name)");
+      stmt.execute("CREATE INDEX idx_score_student ON score(student_id)");
+      // 联合索引
+      stmt.execute("CREATE INDEX idx_score_stu_sub ON score(student_id, subject)");
+
+      System.out.println("创建索引: idx_student_name, idx_score_student, idx_score_stu_sub(联合索引)");
+      System.out.println("\n索引失效场景（面试高频！）：");
+      System.out.println("  1. WHERE中使用函数: WHERE UPPER(name) = '张三' → 索引失效");
+      System.out.println("  2. 前置模糊查询: WHERE name LIKE '%三' → 索引失效");
+      System.out.println("  3. 隐式类型转换: WHERE phone = 13800138000 (phone是varchar) → 索引失效");
+      System.out.println("  4. 联合索引不满足最左前缀: idx(a,b,c) 跳过a直接用b → 索引失效");
+      System.out.println("  5. OR连接非索引列: WHERE a=1 OR b=2 (b无索引) → 索引失效");
+      System.out.println("  6. NOT IN / != / <> → 可能不走索引");
+
+      System.out.println("\n索引使用 EXPLAIN 分析（查看执行计划）:");
+      try (ResultSet rs = stmt.executeQuery(
+          "EXPLAIN SELECT * FROM student WHERE name = '张三'")) {
+        while (rs.next()) {
+          System.out.println("  " + rs.getString(1));
+        }
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
+
+  static void isolationDemo() {
+    System.out.println("事务隔离级别（从低到高）：");
+    System.out.println("┌──────────────┬──────┬──────────┬──────┐");
+    System.out.println("│ 隔离级别      │ 脏读 │ 不可重复读│ 幻读 │");
+    System.out.println("├──────────────┼──────┼──────────┼──────┤");
+    System.out.println("│ READ UNCOMMITTED│ ✓  │    ✓     │  ✓  │");
+    System.out.println("│ READ COMMITTED  │ ✗  │    ✓     │  ✓  │");
+    System.out.println("│ REPEATABLE READ │ ✗  │    ✗     │  ✓  │");
+    System.out.println("│ SERIALIZABLE    │ ✗  │    ✗     │  ✗  │");
+    System.out.println("└──────────────┴──────┴──────────┴──────┘");
+    System.out.println("MySQL默认REPEATABLE READ，Oracle/PostgreSQL默认READ COMMITTED");
+
+    System.out.println("\n脏读: 读到未提交事务的数据（可能回滚）");
+    System.out.println("不可重复读: 同一事务两次读取结果不同（另一事务UPDATE）");
+    System.out.println("幻读: 同一事务两次查询结果行数不同（另一事务INSERT/DELETE）");
+  }
+
+  static void sqlTrapDemo() {
+    try (Connection conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
+        Statement stmt = conn.createStatement()) {
+
+      // 陷阱1：NOT IN + NULL
+      System.out.println("陷阱1: NOT IN 遇到 NULL");
+      try (ResultSet rs = stmt.executeQuery(
+          "SELECT * FROM student WHERE class_id NOT IN (2, NULL)")) {
+        System.out.println("  结果: " + (rs.next() ? "有数据" : "空！"));
+        System.out.println("  原因: NOT IN中有NULL，整个条件变为NULL");
+      }
+
+      // 陷阱2：COUNT
+      System.out.println("\n陷阱2: COUNT(*) vs COUNT(列名)");
+      try (ResultSet rs = stmt.executeQuery(
+          "SELECT COUNT(*) AS c1, COUNT(class_id) AS c2 FROM student")) {
+        rs.next();
+        System.out.println("  COUNT(*): " + rs.getInt("c1") + " (所有行)");
+        System.out.println("  COUNT(class_id): " + rs.getInt("c2") + " (class_id非NULL的行，孙七的class_id是NULL)");
+      }
+
+      // 陷阱3：WHERE vs HAVING
+      System.out.println("\n陷阱3: WHERE 不能跟聚合函数，HAVING 可以");
+      System.out.println("  正确: SELECT ... WHERE score > 80"); // 过滤行
+      System.out.println("  正确: SELECT ... HAVING AVG(score) > 80"); // 过滤分组
+      System.out.println("  错误: SELECT ... WHERE AVG(score) > 80"); // WHERE不能跟聚合函数
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
 }
