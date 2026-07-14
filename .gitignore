@@ -1,0 +1,14 @@
+# 核心：忽略所有编译输出的 class 文件
+*.class
+
+# Maven 项目，直接忽略整个 target 目录
+/target/
+
+# Gradle 项目，直接忽略整个 build 目录
+/build/
+
+# 忽略 IDE 产生的本地配置（如 .idea, .iml, .vscode, .settings 等）
+.idea/
+*.iml
+.vscode/
+.settings/
