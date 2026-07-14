@@ -17,12 +17,12 @@ import java.sql.*;
  * - ResultSet 不能重复遍历
  * - 拼接SQL有注入风险 → 必须用PreparedStatement
  */
-public class JDBCDemo {
+public class H2JDBCDemo {
 
     // H2内存数据库 — 无需安装，进程结束数据消失
     private static final String JDBC_URL = "jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1";
-    private static final String USER = "sa";
-    private static final String PASSWORD = "";
+    private static final String USER = "root";
+    private static final String PASSWORD = "315689";
 
     public static void main(String[] args) {
         System.out.println("========== 1. JDBC连接步骤 ==========");

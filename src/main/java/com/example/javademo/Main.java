@@ -48,7 +48,7 @@ public class Main {
 
         System.out.println("\n>>> 五、数据库（手写SQL）");
         System.out.println("----------------------------------------");
-        JDBCDemo.main(args);
+        H2JDBCDemo.main(args);
         SQLPractice.main(args);
 
         System.out.println("\n>>> 六、设计模式");
