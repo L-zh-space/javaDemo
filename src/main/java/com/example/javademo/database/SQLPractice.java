@@ -45,11 +45,11 @@ public class SQLPractice {
   public static void main(String[] args) {
     // initDatabase();
 
-    System.out.println("\n========== 1. 基本查询(WHERE/ORDER BY/LIMIT) ==========");
+    // System.out.println("\n========== 1. 基本查询(WHERE/ORDER BY/LIMIT) ==========");
     // basicQuery();
 
     // System.out.println("\n========== 2. JOIN联表查询 ==========");
-    joinQuery();
+    // joinQuery();
 
     // System.out.println("\n========== 3. 聚合函数 + GROUP BY + HAVING ==========");
     // groupByQuery();
@@ -122,23 +122,23 @@ public class SQLPractice {
       System.out.println("【SELECT 执行顺序】FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY");
 
       // 查询id大于10的学生
-      // try (ResultSet rs = stmt.executeQuery(
-      // "SELECT name, id FROM students WHERE id > 10 ORDER BY id DESC")) {
-      // System.out.println("id>10的学生（降序）:");
-      // while (rs.next()) {
-      // System.out.println(" " + rs.getString("name") + " " + rs.getInt("id"));
-      // }
-      // }
+      try (ResultSet rs = stmt.executeQuery(
+          "SELECT name, id FROM students WHERE id > 10 ORDER BY id DESC")) {
+        System.out.println("id>10的学生（降序）:");
+        while (rs.next()) {
+          System.out.println(" " + rs.getString("name") + " " + rs.getInt("id"));
+        }
+      }
 
       // LIMIT 分页（假设每页2条，第2页）
-      // System.out.println("\n分页查询（第3页，每页3条）:");
-      // try (ResultSet rs = stmt.executeQuery(
-      // "SELECT name, id FROM students ORDER BY id LIMIT 6,3")) {
-      // // MySQL用LIMIT 2,2，H2用LIMIT 2 OFFSET 2
-      // while (rs.next()) {
-      // System.out.println(" " + rs.getString("name") + rs.getString("id"));
-      // }
-      // }
+      System.out.println("\n分页查询（第3页，每页3条）:");
+      try (ResultSet rs = stmt.executeQuery(
+          "SELECT name, id FROM students ORDER BY id LIMIT 6,3")) {
+        // MySQL用LIMIT 2,2，H2用LIMIT 2 OFFSET 2
+        while (rs.next()) {
+          System.out.println(" " + rs.getString("name") + rs.getString("id"));
+        }
+      }
     } catch (SQLException e) {
       e.printStackTrace();
     }
@@ -148,45 +148,49 @@ public class SQLPractice {
     try (Connection conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
         Statement stmt = conn.createStatement()) {
 
-      // INNER JOIN — 只返回匹配的行
-      System.out.println("INNER JOIN（学生+班级，只返回有班级的学生）:");
+      // INNER JOIN — 返回匹配的行
+      System.out.println("INNER JOIN（课程+学生，返回所有选修了课程的学生（或是有人选的课））:");
       try (ResultSet rs = stmt.executeQuery("""
-          SELECT s.name AS 学生, c.name AS 班级
-          FROM student s
-          INNER JOIN class c ON s.class_id = c.id
+          SELECT s.name AS 学生, c.name AS 课程
+          FROM courses c
+          INNER JOIN enrollments e ON c.id = e.course_id
+          INNER JOIN students s ON e.student_id = s.id
+          ORDER bY 课程 DESC
           """)) {
         while (rs.next()) {
-          System.out.println("  " + rs.getString("学生") + " → " + rs.getString("班级"));
+          System.out.println(" " + rs.getString("课程") + " → " + rs.getString("学生"));
         }
       }
 
       // LEFT JOIN — 左表全部返回
-      System.out.println("\nLEFT JOIN（学生+班级，所有学生都出现）:");
+      System.out.println("\nLEFT 课程+学生，所有课程都出现）:");
       try (ResultSet rs = stmt.executeQuery("""
-          SELECT s.name AS 学生, c.name AS 班级
-          FROM student s
-          LEFT JOIN class c ON s.class_id = c.id
+          SELECT s.name AS 学生, c.name AS 课程
+          FROM courses c
+          LEFT JOIN enrollments e ON c.id = e.course_id
+          LEFT JOIN students s ON e.student_id = s.id
+          ORDER bY 课程 DESC
           """)) {
         while (rs.next()) {
-          String cname = rs.getString("班级");
-          System.out.println("  " + rs.getString("学生") + " → "
-              + (cname != null ? cname : "【NULL-无班级】"));
+          String cname = rs.getString("课程");
+          System.out.println(" " + (cname != null ? cname : "【NULL-无学生】") + " → "
+              + rs.getString("学生"));
         }
       }
 
       // 三表联查
-      System.out.println("\n三表联查（学生+班级+成绩）:");
+      System.out.println("\n三表联查（学生+课程+成绩）:");
       try (ResultSet rs = stmt.executeQuery("""
-          SELECT s.name AS 学生, c.name AS 班级, sc.subject AS 科目, sc.score AS 成绩
-          FROM student s
-          INNER JOIN class c ON s.class_id = c.id
-          INNER JOIN score sc ON s.id = sc.student_id
-          ORDER BY s.name, sc.subject
+              SELECT c.name AS 课程, s.name AS 学生, e.score AS 成绩
+              FROM courses c
+              INNER JOIN enrollments e ON c.id = e.course_id
+              INNER JOIN students s ON e.student_id = s.id
+              ORDER bY 课程 DESC
           """)) {
         while (rs.next()) {
-          System.out.printf("  %s | %s | %s | %.1f%n",
-              rs.getString("学生"), rs.getString("班级"),
-              rs.getString("科目"), rs.getDouble("成绩"));
+          System.out.printf(" %s | %s | %.1f%n",
+              rs.getString("课程"), rs.getString("学生"),
+              rs.getFloat("成绩"));
         }
       }
     } catch (SQLException e) {
