@@ -51,8 +51,8 @@ public class SQLPractice {
     // System.out.println("\n========== 2. JOIN联表查询 ==========");
     // joinQuery();
 
-    // System.out.println("\n========== 3. 聚合函数 + GROUP BY + HAVING ==========");
-    // groupByQuery();
+    System.out.println("\n========== 3. 聚合函数 + GROUP BY + HAVING ==========");
+    groupByQuery();
 
     // System.out.println("\n========== 4. 子查询 ==========");
     // subQuery();
@@ -205,17 +205,17 @@ public class SQLPractice {
       // 每个学生的平均分
       System.out.println("每个学生的平均分:");
       try (ResultSet rs = stmt.executeQuery("""
-          SELECT s.name, AVG(sc.score) AS 平均分, COUNT(*) AS 科目数
-          FROM student s
-          INNER JOIN score sc ON s.id = sc.student_id
+          SELECT s.name AS 姓名, AVG(e.score) AS 平均分, COUNT(*) as 科目数
+          FROM students s
+          LEFT JOIN enrollments e ON s.id = e.student_id
           GROUP BY s.id, s.name
-          HAVING AVG(sc.score) >= 80
-          ORDER BY 平均分 DESC
+          having AVG(e.score) >= 80
+          ORDER BY 平均分 DESC;
           """)) {
         System.out.println("（HAVING过滤平均分>=80的）");
         while (rs.next()) {
           System.out.printf("  %s: 平均%.1f (%d门课)%n",
-              rs.getString("name"), rs.getDouble("平均分"),
+              rs.getString("姓名"), rs.getDouble("平均分"),
               rs.getInt("科目数"));
         }
       }
@@ -223,14 +223,13 @@ public class SQLPractice {
       // 每个班级的学生人数
       System.out.println("\n每个班级人数:");
       try (ResultSet rs = stmt.executeQuery("""
-          SELECT c.name, COUNT(s.id) AS 人数
-          FROM class c
-          LEFT JOIN student s ON c.id = s.class_id
-          GROUP BY c.id, c.name
+          select s.class_name as 班级, count(*) 班级人数
+          from students s 
+          group by s.class_name 
           """)) {
         while (rs.next()) {
-          System.out.println("  " + rs.getString("name") + ": "
-              + rs.getInt("人数") + "人");
+          System.out.println("  " + rs.getString("班级") + ": "
+              + rs.getInt("班级人数") + "人");
         }
       }
     } catch (SQLException e) {
