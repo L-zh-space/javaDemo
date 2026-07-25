@@ -51,11 +51,11 @@ public class SQLPractice {
     // System.out.println("\n========== 2. JOIN联表查询 ==========");
     // joinQuery();
 
-    System.out.println("\n========== 3. 聚合函数 + GROUP BY + HAVING ==========");
-    groupByQuery();
+    // System.out.println("\n========== 3. 聚合函数 + GROUP BY + HAVING ==========");
+    // groupByQuery();
 
-    // System.out.println("\n========== 4. 子查询 ==========");
-    // subQuery();
+    System.out.println("\n========== 4. 子查询 ==========");
+    subQuery();
 
     // System.out.println("\n========== 5. 索引 ==========");
     // indexDemo();
@@ -224,8 +224,8 @@ public class SQLPractice {
       System.out.println("\n每个班级人数:");
       try (ResultSet rs = stmt.executeQuery("""
           select s.class_name as 班级, count(*) 班级人数
-          from students s 
-          group by s.class_name 
+          from students s
+          group by s.class_name
           """)) {
         while (rs.next()) {
           System.out.println("  " + rs.getString("班级") + ": "
@@ -244,11 +244,11 @@ public class SQLPractice {
       // WHERE子查询 — 查询高于平均分的学生
       System.out.println("高于平均分的学生（WHERE子查询）:");
       try (ResultSet rs = stmt.executeQuery("""
-          SELECT s.name, AVG(sc.score) AS 平均分
-          FROM student s
-          INNER JOIN score sc ON s.id = sc.student_id
-          GROUP BY s.id, s.name
-          HAVING AVG(sc.score) > (SELECT AVG(score) FROM score)
+          select s.name , AVG(e.score ) as 平均分
+          from  students s 
+          inner join enrollments e on s.id = e.student_id 
+          group by s.id, s.name 
+          having AVG(e.score) > (select AVG(score) from enrollments e2 )
           """)) {
         while (rs.next()) {
           System.out.printf("  %s: %.1f%n",
@@ -259,18 +259,17 @@ public class SQLPractice {
       // FROM子查询
       System.out.println("\n每个学生最高分科目（FROM子查询）:");
       try (ResultSet rs = stmt.executeQuery("""
-          SELECT s.name, sc.subject, sc.score
-          FROM student s
-          INNER JOIN score sc ON s.id = sc.student_id
-          INNER JOIN (
-              SELECT student_id, MAX(score) AS max_score
-              FROM score GROUP BY student_id
-          ) t ON sc.student_id = t.student_id AND sc.score = t.max_score
+          select s.name, T.max_sc
+          from students s 
+          inner join (
+            select e.student_id, MAX(e.score ) as max_sc
+            from enrollments e 
+            group by student_id
+          ) as T on s.id = T.student_id 
           """)) {
         while (rs.next()) {
-          System.out.printf("  %s: %s %.1f分%n",
-              rs.getString("name"), rs.getString("subject"),
-              rs.getDouble("score"));
+          System.out.printf("  %s 最高分 %.1f分%n",
+              rs.getString("name"), rs.getDouble("score"));
         }
       }
 
