@@ -54,11 +54,11 @@ public class SQLPractice {
     // System.out.println("\n========== 3. 聚合函数 + GROUP BY + HAVING ==========");
     // groupByQuery();
 
-    System.out.println("\n========== 4. 子查询 ==========");
-    subQuery();
+    // System.out.println("\n========== 4. 子查询 ==========");
+    // subQuery();
 
-    // System.out.println("\n========== 5. 索引 ==========");
-    // indexDemo();
+    System.out.println("\n========== 5. 索引 ==========");
+    indexDemo();
 
     // System.out.println("\n========== 6. 事务隔离级别 ==========");
     // isolationDemo();
@@ -245,13 +245,13 @@ public class SQLPractice {
       System.out.println("高于平均分的学生（WHERE子查询）:");
       try (ResultSet rs = stmt.executeQuery("""
           select s.name , AVG(e.score ) as 平均分
-          from  students s 
-          inner join enrollments e on s.id = e.student_id 
-          group by s.id, s.name 
+          from students s
+          inner join enrollments e on s.id = e.student_id
+          group by s.id, s.name
           having AVG(e.score) > (select AVG(score) from enrollments e2 )
           """)) {
         while (rs.next()) {
-          System.out.printf("  %s: %.1f%n",
+          System.out.printf(" %s: %.1f%n",
               rs.getString("name"), rs.getDouble("平均分"));
         }
       }
@@ -259,28 +259,31 @@ public class SQLPractice {
       // FROM子查询
       System.out.println("\n每个学生最高分科目（FROM子查询）:");
       try (ResultSet rs = stmt.executeQuery("""
-          select s.name, T.max_sc
-          from students s 
+          select s.name, c.name , T.max_s
+          from students s
           inner join (
-            select e.student_id, MAX(e.score ) as max_sc
-            from enrollments e 
-            group by student_id
-          ) as T on s.id = T.student_id 
+            select e.student_id, max(e.score) as max_S
+            from enrollments e
+            group by e.student_id
+          ) as T on T.student_id = s.id
+          inner join enrollments e2 on s.id = e2.student_id and T.max_s = e2.score
+          inner join courses c on c.id = e2.course_id
+          order by s.id
           """)) {
         while (rs.next()) {
           System.out.printf("  %s 最高分 %.1f分%n",
-              rs.getString("name"), rs.getDouble("score"));
+              rs.getString("s.name"), rs.getDouble("T.max_s"));
         }
       }
 
       // EXISTS 子查询 — 有成绩的学生
       System.out.println("\n有考试成绩的学生（EXISTS）:");
       try (ResultSet rs = stmt.executeQuery("""
-          SELECT name FROM student s
-          WHERE EXISTS (SELECT 1 FROM score sc WHERE sc.student_id = s.id)
+          SELECT name FROM students s
+          WHERE EXISTS (SELECT 1 FROM enrollments e WHERE e.student_id = s.id)
           """)) {
         while (rs.next()) {
-          System.out.println("  " + rs.getString("name"));
+          System.out.println(" " + rs.getString("name"));
         }
       }
     } catch (SQLException e) {
