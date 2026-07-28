@@ -60,8 +60,8 @@ public class SQLPractice {
     // System.out.println("\n========== 5. 索引 ==========");
     // indexDemo();
 
-    System.out.println("\n========== 6. 事务隔离级别 ==========");
-    isolationDemo();
+    // System.out.println("\n========== 6. 事务隔离级别 ==========");
+    // isolationDemo();
 
     // System.out.println("\n========== 7. 常见SQL陷阱 ==========");
     // sqlTrapDemo();
