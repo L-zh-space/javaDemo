@@ -57,11 +57,11 @@ public class SQLPractice {
     // System.out.println("\n========== 4. 子查询 ==========");
     // subQuery();
 
-    System.out.println("\n========== 5. 索引 ==========");
-    indexDemo();
+    // System.out.println("\n========== 5. 索引 ==========");
+    // indexDemo();
 
-    // System.out.println("\n========== 6. 事务隔离级别 ==========");
-    // isolationDemo();
+    System.out.println("\n========== 6. 事务隔离级别 ==========");
+    isolationDemo();
 
     // System.out.println("\n========== 7. 常见SQL陷阱 ==========");
     // sqlTrapDemo();
@@ -295,13 +295,13 @@ public class SQLPractice {
     try (Connection conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
         Statement stmt = conn.createStatement()) {
 
+      System.out.println("创建索引: idx_student_name, idx_enrollments_student, idx_stu_enroll_course(联合索引)");
       // 创建索引
-      stmt.execute("CREATE INDEX idx_student_name ON student(name)");
-      stmt.execute("CREATE INDEX idx_score_student ON score(student_id)");
+      stmt.execute("CREATE INDEX idx_student_name ON students(name)");
+      stmt.execute("CREATE INDEX idx_enrollments_student ON enrollments(student_id)");
       // 联合索引
-      stmt.execute("CREATE INDEX idx_score_stu_sub ON score(student_id, subject)");
+      stmt.execute("CREATE INDEX idx_stu_enroll_course ON enrollments(student_id, course_id)");
 
-      System.out.println("创建索引: idx_student_name, idx_score_student, idx_score_stu_sub(联合索引)");
       System.out.println("\n索引失效场景（面试高频！）：");
       System.out.println("  1. WHERE中使用函数: WHERE UPPER(name) = '张三' → 索引失效");
       System.out.println("  2. 前置模糊查询: WHERE name LIKE '%三' → 索引失效");
