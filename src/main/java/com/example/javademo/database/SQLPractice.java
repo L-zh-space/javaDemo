@@ -63,8 +63,8 @@ public class SQLPractice {
     // System.out.println("\n========== 6. 事务隔离级别 ==========");
     // isolationDemo();
 
-    // System.out.println("\n========== 7. 常见SQL陷阱 ==========");
-    // sqlTrapDemo();
+    System.out.println("\n========== 7. 常见SQL陷阱 ==========");
+    sqlTrapDemo();
   }
 
   static void initDatabase() {
@@ -343,28 +343,31 @@ public class SQLPractice {
     try (Connection conn = DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
         Statement stmt = conn.createStatement()) {
 
-      // 陷阱1：NOT IN + NULL
-      System.out.println("陷阱1: NOT IN 遇到 NULL");
-      try (ResultSet rs = stmt.executeQuery(
-          "SELECT * FROM student WHERE class_id NOT IN (2, NULL)")) {
-        System.out.println("  结果: " + (rs.next() ? "有数据" : "空！"));
-        System.out.println("  原因: NOT IN中有NULL，整个条件变为NULL");
-      }
+      // // 陷阱1：NOT IN + NULL
+      // System.out.println("陷阱1: NOT IN 遇到 NULL");
+      // try (ResultSet rs = stmt.executeQuery(
+      //     // "select * from students s where s.class_name not in ('计科2401')")) {
+      //   // "select * from students s where s.class_name not in ('计科2401', NULL)")) {
+      //   "select * from students s where s.class_name is not NULL and s.class_name <> '计科2401'")) {
+      //   System.out.println("  结果: " + (rs.next() ? "有数据" : "空！"));
+      //   System.out.println("  原因: NOT IN中有NULL，整个条件变为NULL");
+      // }
 
-      // 陷阱2：COUNT
-      System.out.println("\n陷阱2: COUNT(*) vs COUNT(列名)");
-      try (ResultSet rs = stmt.executeQuery(
-          "SELECT COUNT(*) AS c1, COUNT(class_id) AS c2 FROM student")) {
-        rs.next();
-        System.out.println("  COUNT(*): " + rs.getInt("c1") + " (所有行)");
-        System.out.println("  COUNT(class_id): " + rs.getInt("c2") + " (class_id非NULL的行，孙七的class_id是NULL)");
-      }
+      // // 陷阱2：COUNT
+      // System.out.println("\n陷阱2: COUNT(*) vs COUNT(列名)");
+      // try (ResultSet rs = stmt.executeQuery(
+      // "SELECT COUNT(*) AS c1, COUNT(class_id) AS c2 FROM student")) {
+      // rs.next();
+      // System.out.println(" COUNT(*): " + rs.getInt("c1") + " (所有行)");
+      // System.out.println(" COUNT(class_id): " + rs.getInt("c2") + "
+      // (class_id非NULL的行，孙七的class_id是NULL)");
+      // }
 
-      // 陷阱3：WHERE vs HAVING
-      System.out.println("\n陷阱3: WHERE 不能跟聚合函数，HAVING 可以");
-      System.out.println("  正确: SELECT ... WHERE score > 80"); // 过滤行
-      System.out.println("  正确: SELECT ... HAVING AVG(score) > 80"); // 过滤分组
-      System.out.println("  错误: SELECT ... WHERE AVG(score) > 80"); // WHERE不能跟聚合函数
+      // // 陷阱3：WHERE vs HAVING
+      // System.out.println("\n陷阱3: WHERE 不能跟聚合函数，HAVING 可以");
+      // System.out.println(" 正确: SELECT ... WHERE score > 80"); // 过滤行
+      // System.out.println(" 正确: SELECT ... HAVING AVG(score) > 80"); // 过滤分组
+      // System.out.println(" 错误: SELECT ... WHERE AVG(score) > 80"); // WHERE不能跟聚合函数
     } catch (SQLException e) {
       e.printStackTrace();
     }
