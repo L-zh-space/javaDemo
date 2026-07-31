@@ -20,13 +20,13 @@ public class RedisDemo {
     // Redis 服务器地址
     static final String REDIS_HOST = "localhost";
     // Redis 端口
-    static final int REDIS_PORT = 6379;
+    static final int REDIS_PORT = 6383;
     // Redis 密码（默认无密码，若设置了密码则填写）
     static final String REDIS_PASSWORD = null;
 
     public static void main(String[] args) {
-        System.out.println("========== 1. 连接 Redis ==========");
-        connectRedis();
+        // System.out.println("========== 1. 连接 Redis ==========");
+        // connectRedis();
         System.out.println("\n========== 2. 基础操作 ==========");
         basicOps();
     }
@@ -47,11 +47,11 @@ public class RedisDemo {
 
     static void basicOps() {
         try (Jedis jedis = new Jedis(REDIS_HOST, REDIS_PORT)) {
-            System.out.println("========== 3. String 操作 ==========");
-            // SET — 设置键值
-            jedis.set("name", "张三");
-            // GET — 获取键值
-            System.out.println("GET name → " + jedis.get("name"));
+            System.out.println("========== 2.1. String 操作 ==========");
+            // // SET — 设置键值
+            // jedis.set("name", "张三");
+            // // GET — 获取键值
+            // System.out.println("GET name → " + jedis.get("name"));
 
             // SETEX — 设置带过期时间的键（秒）
             jedis.setex("temp_key", 10, "10秒后过期");
@@ -59,14 +59,14 @@ public class RedisDemo {
             // TTL — 查看剩余过期时间
             System.out.println("TTL temp_key → " + jedis.ttl("temp_key"));
 
-            System.out.println("========== 4. Key 操作 ==========");
-            // EXISTS — 判断键是否存在
-            System.out.println("EXISTS name → " + jedis.exists("name"));
-            // DEL — 删除键
-            jedis.del("temp_key");
-            System.out.println("DEL temp_key 后 EXISTS → " + jedis.exists("temp_key"));
-            // KEYS — 模糊匹配键（生产环境慎用！）
-            System.out.println("KEYS n* → " + jedis.keys("n*"));
+            // System.out.println("========== 2.2. Key 操作 ==========");
+            // // EXISTS — 判断键是否存在
+            // System.out.println("EXISTS name → " + jedis.exists("name"));
+            // // DEL — 删除键
+            // jedis.del("temp_key");
+            // System.out.println("DEL temp_key 后 EXISTS → " + jedis.exists("temp_key"));
+            // // KEYS — 模糊匹配键（生产环境慎用！）
+            // System.out.println("KEYS n* → " + jedis.keys("n*"));
         } catch (Exception e) {
             e.printStackTrace();
         }
