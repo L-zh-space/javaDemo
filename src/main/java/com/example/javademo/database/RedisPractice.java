@@ -51,14 +51,14 @@ import java.util.Set;
 public class RedisPractice {
 
     private static final String REDIS_HOST = "localhost";
-    private static final int REDIS_PORT = 6379;
+    private static final int REDIS_PORT = 6383;
 
     // 使用连接池（生产环境推荐，避免频繁创建连接）
     private static final JedisPool pool = new JedisPool(REDIS_HOST, REDIS_PORT);
 
     public static void main(String[] args) {
-        // System.out.println("\n========== 1. String 操作 ==========");
-        // stringOps();
+        System.out.println("\n========== 1. String 操作 ==========");
+        stringOps();
 
         // System.out.println("\n========== 2. Hash 操作 ==========");
         // hashOps();
@@ -81,8 +81,8 @@ public class RedisPractice {
         // System.out.println("\n========== 8. 事务 ==========");
         // transactionDemo();
 
-        System.out.println("\n========== 9. Pub/Sub 发布订阅 ==========");
-        pubSubDemo();
+        // System.out.println("\n========== 9. Pub/Sub 发布订阅 ==========");
+        // pubSubDemo();
     }
 
     // ==================== 1. String 操作 ====================
@@ -90,40 +90,41 @@ public class RedisPractice {
     static void stringOps() {
         try (Jedis jedis = pool.getResource()) {
 
-            // 基础 SET/GET
-            jedis.set("user:1:name", "张三");
-            System.out.println("GET → " + jedis.get("user:1:name"));
+            // // 基础 SET/GET
+            // jedis.set("name", "张三");
+            // jedis.set("user:1:name", "张三");
+            // System.out.println("GET → " + jedis.get("user:1:name"));
 
-            // SETNX — 不存在才设置（分布式锁基础）
-            long result = jedis.setnx("lock:order:1001", "thread-1");
-            System.out.println("SETNX（首次） → " + result); // 1=成功
-            result = jedis.setnx("lock:order:1001", "thread-2");
-            System.out.println("SETNX（重复） → " + result); // 0=失败
+            // // SETNX — 不存在才设置（分布式锁基础）
+            // long result = jedis.setnx("lock:order:1001", "thread-1");
+            // System.out.println("SETNX（首次） → " + result); // 1=成功
+            // result = jedis.setnx("lock:order:1001", "thread-2");
+            // System.out.println("SETNX（重复） → " + result); // 0=失败
 
-            // SET 带参数（替代 SETEX + SETNX）
-            jedis.set("counter", "0", SetParams.setParams().nx().ex(60));
-            System.out.println("\nSET NX EX → counter=" + jedis.get("counter"));
+            // // SET 带参数（替代 SETEX + SETNX）
+            // jedis.set("counter", "0", SetParams.setParams().nx().ex(60));
+            // System.out.println("\nSET NX EX → counter=" + jedis.get("counter"));
 
-            // INCR / DECR — 原子增减（计数器、限流）
-            jedis.incr("counter");
-            jedis.incrBy("counter", 5);
-            System.out.println("INCR两次后 counter → " + jedis.get("counter"));
+            // // INCR / DECR — 原子增减（计数器、限流）
+            // jedis.incr("counter");
+            // jedis.incrBy("counter", -5);
+            // System.out.println("INCR两次后 counter → " + jedis.get("counter"));
 
-            // MSET / MGET — 批量读写
-            jedis.mset("k1", "v1", "k2", "v2", "k3", "v3");
-            List<String> values = jedis.mget("k1", "k2", "k3");
-            System.out.println("MGET → " + values);
+            // // MSET / MGET — 批量读写
+            // jedis.mset("k1", "v1", "k2", "v2", "k3", "v3");
+            // List<String> values = jedis.mget("k1", "k2", "k3");
+            // System.out.println("MGET → " + values);
 
-            // 编码对象存JSON
-            jedis.set("user:1", "{\"id\":1,\"name\":\"张三\",\"age\":20}");
-            System.out.println("User JSON → " + jedis.get("user:1"));
+            // // 编码对象存JSON
+            // jedis.set("user:1", "{\"id\":1,\"name\":\"张三\",\"age\":20}");
+            // System.out.println("User JSON → " + jedis.get("user:1"));
 
             // GETSET — 返回旧值并设新值
             String old = jedis.getSet("counter", "0");
             System.out.println("GETSET 旧值 → " + old);
 
-            // 清理
-            jedis.del("user:1:name", "lock:order:1001", "counter", "k1", "k2", "k3", "user:1");
+            // // 清理
+            // jedis.del("user:1:name", "lock:order:1001", "counter", "k1", "k2", "k3", "user:1");
         }
     }
 
