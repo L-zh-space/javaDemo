@@ -53,11 +53,11 @@ public class RedisDemo {
             // // GET — 获取键值
             // System.out.println("GET name → " + jedis.get("name"));
 
-            // SETEX — 设置带过期时间的键（秒）
-            jedis.setex("temp_key", 10, "10秒后过期");
-            System.out.println("GET temp_key → " + jedis.get("temp_key"));
-            // TTL — 查看剩余过期时间
-            System.out.println("TTL temp_key → " + jedis.ttl("temp_key"));
+            // // SETEX — 设置带过期时间的键（秒）
+            // jedis.setex("temp_key", 10, "10秒后过期");
+            // System.out.println("GET temp_key → " + jedis.get("temp_key"));
+            // // TTL — 查看剩余过期时间
+            // System.out.println("TTL temp_key → " + jedis.ttl("temp_key"));
 
             // System.out.println("========== 2.2. Key 操作 ==========");
             // // EXISTS — 判断键是否存在
