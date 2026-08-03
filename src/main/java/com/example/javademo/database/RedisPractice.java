@@ -57,14 +57,14 @@ public class RedisPractice {
     private static final JedisPool pool = new JedisPool(REDIS_HOST, REDIS_PORT);
 
     public static void main(String[] args) {
-        System.out.println("\n========== 1. String 操作 ==========");
-        stringOps();
+        // System.out.println("\n========== 1. String 操作 ==========");
+        // stringOps();
 
         // System.out.println("\n========== 2. Hash 操作 ==========");
         // hashOps();
 
-        // System.out.println("\n========== 3. List 操作 ==========");
-        // listOps();
+        System.out.println("\n========== 3. List 操作 ==========");
+        listOps();
 
         // System.out.println("\n========== 4. Set 操作 ==========");
         // setOps();
@@ -133,35 +133,36 @@ public class RedisPractice {
     static void hashOps() {
         try (Jedis jedis = pool.getResource()) {
 
-            // HSET — 设置单个字段
-            jedis.hset("user:1001", "name", "张三");
-            jedis.hset("user:1001", "age", "20");
-            jedis.hset("user:1001", "city", "北京");
+            // // HSET — 设置单个字段
+            // jedis.hset("user:1001", "name", "张三");
+            // jedis.hset("user:1001", "age", "20");
+            // jedis.hset("user:1001", "city", "北京");
 
-            // HMSET — 批量设置字段
-            Map<String, String> fields = new HashMap<>();
-            fields.put("email", "zhangsan@test.com");
-            fields.put("phone", "13800138000");
-            jedis.hset("user:1001", fields);
+            // // HMSET — 批量设置字段
+            // Map<String, String> fields = new HashMap<>();
+            // fields.put("email", "zhangsan@test.com");
+            // fields.put("phone", "13800138000");
+            // jedis.hset("user:1001", fields);
 
-            // HGET / HGETALL — 获取字段
-            System.out.println("HGET name → " + jedis.hget("user:1001", "name"));
-            System.out.println("HGETALL → " + jedis.hgetAll("user:1001"));
+            // // HGET / HGETALL — 获取字段
+            // System.out.println("HGET name → " + jedis.hget("user:1001", "name"));
+            // System.out.println("HGETALL → " + jedis.hgetAll("user:1001"));
 
-            // HEXISTS / HDEL
-            System.out.println("HEXISTS email → " + jedis.hexists("user:1001", "email"));
-            jedis.hdel("user:1001", "phone");
+            // // HEXISTS / HDEL
+            // System.out.println("HEXISTS email → " + jedis.hexists("user:1001", "email"));
+            // jedis.hdel("user:1001", "phone");
 
-            // HINCRBY — 原子增减（计数器场景）
-            jedis.hset("article:1", "views", "0");
-            jedis.hincrBy("article:1", "views", 1);
-            System.out.println("文章浏览量 → " + jedis.hget("article:1", "views"));
+            // // HINCRBY — 原子增减（计数器场景）
+            // jedis.hset("article:1", "views", "0");
+            // jedis.hincrBy("article:1", "views", 1);
+            // System.out.println("文章浏览量 → " + jedis.hget("article:1", "views"));
 
-            // HKEYS / HVALS — 所有字段名/值
-            System.out.println("HKEYS → " + jedis.hkeys("user:1001"));
+            // // HKEYS / HVALS — 所有字段名/值
+            // System.out.println("HKEYS → " + jedis.hkeys("user:1001"));
+            // System.out.println("HVALS → " + jedis.hvals("user:1001"));
 
-            // 清理
-            jedis.del("user:1001", "article:1");
+            // // 清理
+            // jedis.del("user:1001", "article:1");
         }
     }
 
