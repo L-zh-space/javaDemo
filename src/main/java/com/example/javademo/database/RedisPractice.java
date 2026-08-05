@@ -171,36 +171,36 @@ public class RedisPractice {
     static void listOps() {
         try (Jedis jedis = pool.getResource()) {
 
-            // LPUSH / RPUSH — 左/右插入
-            jedis.lpush("tasks", "任务A", "任务B"); // 左边插入 → [B, A]
-            jedis.rpush("tasks", "任务C", "任务D"); // 右边插入 → [B, A, C, D]
+            // // LPUSH / RPUSH — 左/右插入
+            // jedis.lpush("tasks", "任务A", "任务B"); // 左边插入 → [B, A]
+            // jedis.rpush("tasks", "任务C", "任务D"); // 右边插入 → [B, A, C, D]
 
-            // LRANGE — 范围查询（0 -1 查全部）
-            System.out.println("LRANGE → " + jedis.lrange("tasks", 0, -1));
-
-            // LPOP / RPOP — 弹出元素（可做队列/栈）
-            System.out.println("LPOP → " + jedis.lpop("tasks")); // B（最先弹出）
-            System.out.println("RPOP → " + jedis.rpop("tasks")); // D
-
-            // LLEN — 长度
-            System.out.println("LLEN → " + jedis.llen("tasks"));
+            // // LRANGE — 范围查询（0 -1 查全部）
+            // System.out.println("LRANGE → " + jedis.lrange("tasks", 0, -1));
 
             // LINDEX — 按索引获取
-            System.out.println("LINDEX[0] → " + jedis.lindex("tasks", 0));
+            // System.out.println("LINDEX[0] → " + jedis.lindex("tasks", 0));
 
-            // 消息队列模式：生产者-消费者
-            System.out.println("\n--- 消息队列模拟 ---");
-            jedis.del("mq:orders");
-            // 生产者
-            jedis.lpush("mq:orders", "order:1", "order:2", "order:3");
-            System.out.println("生产了3个订单");
-            // 消费者（阻塞式 — 实际生产用BRPOP）
-            while (jedis.llen("mq:orders") > 0) {
-                System.out.println("消费 → " + jedis.rpop("mq:orders"));
-            }
+            // // LLEN — 长度
+            // System.out.println("LLEN → " + jedis.llen("tasks"));
+            
+            // LPOP / RPOP — 弹出元素（可做队列/栈）
+            // System.out.println("LPOP → " + jedis.lpop("tasks")); // B（最先弹出）
+            // System.out.println("RPOP → " + jedis.rpop("tasks")); // D
 
-            // 清理
-            jedis.del("tasks", "mq:orders");
+            // // 消息队列模式：生产者-消费者
+            // System.out.println("\n--- 消息队列模拟 ---");
+            // jedis.del("mq:orders");
+            // // 生产者
+            // jedis.lpush("mq:orders", "order:1", "order:2", "order:3");
+            // System.out.println("生产了3个订单");
+            // // 消费者（阻塞式 — 实际生产用BRPOP）
+            // while (jedis.llen("mq:orders") > 0) {
+            //     System.out.println("消费 → " + jedis.brpop(1, "mq:orders"));
+            // }
+
+            // // 清理
+            // jedis.del("tasks", "mq:orders");
         }
     }
 
