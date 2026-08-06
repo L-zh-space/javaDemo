@@ -66,14 +66,14 @@ public class RedisPractice {
         // System.out.println("\n========== 3. List 操作 ==========");
         // listOps();
 
-        System.out.println("\n========== 4. Set 操作 ==========");
-        setOps();
+        // System.out.println("\n========== 4. Set 操作 ==========");
+        // setOps();
 
         // System.out.println("\n========== 5. ZSet 操作 ==========");
         // zsetOps();
 
-        // System.out.println("\n========== 6. 过期策略 & TTL ==========");
-        // expiryDemo();
+        System.out.println("\n========== 6. 过期策略 & TTL ==========");
+        expiryDemo();
 
         // System.out.println("\n========== 7. Pipeline 批量操作 ==========");
         // pipelineDemo();
@@ -248,41 +248,41 @@ public class RedisPractice {
     static void zsetOps() {
         try (Jedis jedis = pool.getResource()) {
 
-            // ZADD — 添加元素（带score）
-            jedis.zadd("leaderboard", 85, "张三");
-            jedis.zadd("leaderboard", 92, "李四");
-            jedis.zadd("leaderboard", 78, "王五");
-            jedis.zadd("leaderboard", 88, "赵六");
+            // // ZADD — 添加元素（带score）
+            // jedis.zadd("leaderboard", 85, "张三");
+            // jedis.zadd("leaderboard", 92, "李四");
+            // jedis.zadd("leaderboard", 78, "王五");
+            // jedis.zadd("leaderboard", 88, "赵六");
 
-            // ZRANGE — 按score正序排列
-            System.out.println("排名（低→高）: " + jedis.zrange("leaderboard", 0, -1));
+            // // ZRANGE — 按score正序排列
+            // System.out.println("排名（低→高）: " + jedis.zrange("leaderboard", 0, -1));
 
-            // ZREVRANGE — 按score倒序排列
-            System.out.println("排名（高→低）: " + jedis.zrevrange("leaderboard", 0, -1));
+            // // ZREVRANGE — 按score倒序排列
+            // System.out.println("排名（高→低）: " + jedis.zrevrange("leaderboard", 0, -1));
 
-            // ZRANK — 获取排名（从0开始）
-            System.out.println("李四排名 → " + jedis.zrank("leaderboard", "李四"));
+            // // ZRANK — 获取排名（从0开始）
+            // System.out.println("李四排名 → " + jedis.zrank("leaderboard", "李四"));
 
-            // ZSCORE — 获取分数
-            System.out.println("张三分数 → " + jedis.zscore("leaderboard", "张三"));
+            // // ZSCORE — 获取分数
+            // System.out.println("张三分数 → " + jedis.zscore("leaderboard", "张三"));
 
-            // ZINCRBY — 增减分数
-            jedis.zincrby("leaderboard", 5, "王五"); // 加5分
-            System.out.println("王五加5分后 → " + jedis.zscore("leaderboard", "王五"));
+            // // ZINCRBY — 增减分数
+            // jedis.zincrby("leaderboard", 5, "王五"); // 加5分
+            // System.out.println("王五加5分后 → " + jedis.zscore("leaderboard", "王五"));
 
-            // ZRANGEBYSCORE — 按分数范围查询
-            System.out.println("80~90分段 → " + jedis.zrangeByScore("leaderboard", 80, 90));
+            // // ZRANGEBYSCORE — 按分数范围查询
+            // System.out.println("80~90分段 → " + jedis.zrangeByScore("leaderboard", 80, 90));
 
-            // 带分数的查询
-            System.out.println("\n排行榜（带分数）:");
-            List<redis.clients.jedis.resps.Tuple> tuples = jedis.zrevrangeWithScores("leaderboard", 0, -1);
-            for (int i = 0; i < tuples.size(); i++) {
-                redis.clients.jedis.resps.Tuple t = tuples.get(i);
-                System.out.printf("  第%d名: %s (%.0f分)%n", i + 1, t.getElement(), t.getScore());
-            }
+            // // 带分数的查询
+            // System.out.println("\n排行榜（带分数）:");
+            // List<redis.clients.jedis.resps.Tuple> tuples = jedis.zrevrangeWithScores("leaderboard", 0, -1);
+            // for (int i = 0; i < tuples.size(); i++) {
+            //     redis.clients.jedis.resps.Tuple t = tuples.get(i);
+            //     System.out.printf("  第%d名: %s (%.0f分)%n", i + 1, t.getElement(), t.getScore());
+            // }
 
-            // 清理
-            jedis.del("leaderboard");
+            // // 清理
+            // jedis.del("leaderboard");
         }
     }
 
