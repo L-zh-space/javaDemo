@@ -63,11 +63,11 @@ public class RedisPractice {
         // System.out.println("\n========== 2. Hash 操作 ==========");
         // hashOps();
 
-        System.out.println("\n========== 3. List 操作 ==========");
-        listOps();
+        // System.out.println("\n========== 3. List 操作 ==========");
+        // listOps();
 
-        // System.out.println("\n========== 4. Set 操作 ==========");
-        // setOps();
+        System.out.println("\n========== 4. Set 操作 ==========");
+        setOps();
 
         // System.out.println("\n========== 5. ZSet 操作 ==========");
         // zsetOps();
@@ -206,42 +206,42 @@ public class RedisPractice {
 
     // ==================== 4. Set 操作 ====================
 
-    static void setOps() {
-        try (Jedis jedis = pool.getResource()) {
+    // static void setOps() {
+    //     try (Jedis jedis = pool.getResource()) {
 
-            // SADD — 添加元素（自动去重）
-            jedis.sadd("tags:java", "Spring", "MyBatis", "Redis", "Spring"); // Spring重复不会加入
-            jedis.sadd("tags:python", "Django", "Flask", "Redis");
+    //         // SADD — 添加元素（自动去重）
+    //         jedis.sadd("tags:java", "Spring", "MyBatis", "Redis", "Spring"); // Spring重复不会加入
+    //         jedis.sadd("tags:python", "Django", "Flask", "Redis");
 
-            // SMEMBERS — 查看所有成员
-            System.out.println("java标签 → " + jedis.smembers("tags:java"));
+    //         // SMEMBERS — 查看所有成员
+    //         System.out.println("java标签 → " + jedis.smembers("tags:java"));
 
-            // SCARD — 元素个数
-            System.out.println("SCARD → " + jedis.scard("tags:java"));
+    //         // SCARD — 元素个数
+    //         System.out.println("SCARD → " + jedis.scard("tags:java"));
 
-            // SISMEMBER — 判断是否存在
-            System.out.println("Spring 存在? → " + jedis.sismember("tags:java", "Spring"));
+    //         // SISMEMBER — 判断是否存在
+    //         System.out.println("Spring 存在? → " + jedis.sismember("tags:java", "Spring"));
 
-            // 集合运算（交、并、差）
-            System.out.println("\n--- 集合运算 ---");
-            System.out.println("交集 SINTER → " + jedis.sinter("tags:java", "tags:python"));
-            System.out.println("并集 SUNION → " + jedis.sunion("tags:java", "tags:python"));
-            System.out.println("差集 SDIFF java-python → " + jedis.sdiff("tags:java", "tags:python"));
+    //         // 集合运算（交、并、差）
+    //         System.out.println("\n--- 集合运算 ---");
+    //         System.out.println("交集 SINTER → " + jedis.sinter("tags:java", "tags:python"));
+    //         System.out.println("并集 SUNION → " + jedis.sunion("tags:java", "tags:python"));
+    //         System.out.println("差集 SDIFF java-python → " + jedis.sdiff("tags:java", "tags:python"));
 
-            // 共同关注场景
-            jedis.sadd("follow:user1", "userA", "userB", "userC");
-            jedis.sadd("follow:user2", "userB", "userC", "userD");
-            System.out.println("\n共同关注 → " + jedis.sinter("follow:user1", "follow:user2"));
+    //         // 共同关注场景
+    //         jedis.sadd("follow:user1", "userA", "userB", "userC");
+    //         jedis.sadd("follow:user2", "userB", "userC", "userD");
+    //         System.out.println("\n共同关注 → " + jedis.sinter("follow:user1", "follow:user2"));
 
-            // SPOP — 随机弹出一个元素（抽奖场景）
-            jedis.del("lottery:pool");
-            jedis.sadd("lottery:pool", "奖品1", "奖品2", "奖品3", "参与奖");
-            System.out.println("抽到 → " + jedis.spop("lottery:pool"));
+    //         // SPOP — 随机弹出一个元素（抽奖场景）
+    //         jedis.del("lottery:pool");
+    //         jedis.sadd("lottery:pool", "奖品1", "奖品2", "奖品3", "参与奖");
+    //         System.out.println("抽到 → " + jedis.spop("lottery:pool"));
 
-            // 清理
-            jedis.del("tags:java", "tags:python", "follow:user1", "follow:user2", "lottery:pool");
-        }
-    }
+    //         // 清理
+    //         jedis.del("tags:java", "tags:python", "follow:user1", "follow:user2", "lottery:pool");
+    //     }
+    // }
 
     // ==================== 5. ZSet 操作 ====================
 
