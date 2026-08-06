@@ -291,33 +291,33 @@ public class RedisPractice {
     static void expiryDemo() {
         try (Jedis jedis = pool.getResource()) {
 
-            // 设置key并指定过期时间
-            jedis.setex("code:13800138000", 60, "123456"); // 60秒过期（验证码场景）
-            System.out.println("验证码 → " + jedis.get("code:13800138000"));
-            System.out.println("TTL → " + jedis.ttl("code:13800138000") + "秒");
+            // // 设置key并指定过期时间
+            // jedis.setex("code:13800138000", 60, "123456"); // 60秒过期（验证码场景）
+            // System.out.println("验证码 → " + jedis.get("code:13800138000"));
+            // System.out.println("TTL → " + jedis.ttl("code:13800138000") + "秒");
 
-            // EXPIRE — 给已有key设过期
-            jedis.set("session:abc", "user-data");
-            jedis.expire("session:abc", 30);
-            System.out.println("session TTL → " + jedis.ttl("session:abc"));
+            // // EXPIRE — 给已有key设过期
+            // jedis.set("session:abc", "user-data");
+            // jedis.expire("session:abc", 30);
+            // System.out.println("session TTL → " + jedis.ttl("session:abc"));
 
-            // PERSIST — 移除过期时间
-            jedis.persist("session:abc");
-            System.out.println("PERSIST后 TTL → " + jedis.ttl("session:abc") + "（-1=永不过期）");
+            // // PERSIST — 移除过期时间
+            // jedis.persist("session:abc");
+            // System.out.println("PERSIST后 TTL → " + jedis.ttl("session:abc") + "（-1=永不过期）");
 
-            // 缓存三大问题说明
-            System.out.println("\n--- 缓存三大问题 ---");
-            System.out.println("1. 缓存穿透: 查不存在的数据 → 布隆过滤器 / 空值缓存(短过期)");
-            System.out.println("     示例: nullValueCache(jedis);");
-            System.out.println("2. 缓存击穿: 热点key过期 → 互斥锁 / 逻辑过期");
-            System.out.println("     示例: mutexLock(jedis, \"hot:item:1\");");
-            System.out.println("3. 缓存雪崩: 大量key同时过期 → 过期时间+随机 / 高可用");
+            // // 缓存三大问题说明
+            // System.out.println("\n--- 缓存三大问题 ---");
+            // System.out.println("1. 缓存穿透: 查不存在的数据 → 布隆过滤器 / 空值缓存(短过期)");
+            // System.out.println("     示例: nullValueCache(jedis);");
+            // System.out.println("2. 缓存击穿: 热点key过期 → 互斥锁 / 逻辑过期");
+            // System.out.println("     示例: mutexLock(jedis, \"hot:item:1\");");
+            // System.out.println("3. 缓存雪崩: 大量key同时过期 → 过期时间+随机 / 高可用");
 
-            // 缓存穿透应对：缓存空值
-            nullValueCache(jedis);
+            // // 缓存穿透应对：缓存空值
+            // nullValueCache(jedis);
 
-            // 清理
-            jedis.del("code:13800138000", "session:abc", "user:99999");
+            // // 清理
+            // jedis.del("code:13800138000", "session:abc", "user:99999");
         }
     }
 
