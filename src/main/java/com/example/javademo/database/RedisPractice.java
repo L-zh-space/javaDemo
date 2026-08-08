@@ -72,11 +72,11 @@ public class RedisPractice {
         // System.out.println("\n========== 5. ZSet 操作 ==========");
         // zsetOps();
 
-        System.out.println("\n========== 6. 过期策略 & TTL ==========");
-        expiryDemo();
+        // System.out.println("\n========== 6. 过期策略 & TTL ==========");
+        // expiryDemo();
 
-        // System.out.println("\n========== 7. Pipeline 批量操作 ==========");
-        // pipelineDemo();
+        System.out.println("\n========== 7. Pipeline 批量操作 ==========");
+        pipelineDemo();
 
         // System.out.println("\n========== 8. 事务 ==========");
         // transactionDemo();
